@@ -1,1 +1,10 @@
-{}
+{
+    "52f468c0012875e63f1d81f649230c3211c18e29d436981aaf06bca159831393": {
+        "seq": 128,
+        "record": "enr:-KC4QJS3TpbQhlOMSZjcXrwcMeJ-YOqvfFBTCygrIb6Zhh_1N5Jlq7-9P6FPV_4dN9ASZitz1_3rXs1VsLw-0ScQzfOBgINldGjKyYRmjbCvg4phyIJpZIJ2NIJpcIS5I61ng2xlc8CJc2VjcDI1NmsxoQPhQHskMjUDcMic299e94UdJ8vQ54YWjxSH2HMJcD5YOIN0Y3CCdl-DdWRwgnZf",
+        "score": 1,
+        "firstResponse": "2019-12-05T10:42:30Z",
+        "lastResponse": "2019-12-05T10:42:30Z",
+        "lastCheck": "2019-12-05T10:42:30Z"
+    }
+}
