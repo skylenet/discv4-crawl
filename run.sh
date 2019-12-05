@@ -7,7 +7,7 @@ CRAWL_GIT_USER="${CRAWL_GIT_USER:-crawler}"
 CRAWL_GIT_EMAIL="${CRAWL_GIT_EMAIL:-crawler@localhost}"
 
 CRAWL_TIMEOUT="${CRAWL_TIMEOUT:-30m}"
-CRAWL_DNS_SIGNING_KEY="${CRAWL_DNS_SIGNING_KEY}:-/secrets/key.json"
+CRAWL_DNS_SIGNING_KEY="${CRAWL_DNS_SIGNING_KEY:-/secrets/key.json}"
 
 set -xe
 
@@ -38,7 +38,7 @@ generate_list() {
 sign_lists() {
   for D in *.nodes.ethereum.org; do
     if [ -d "${D}" ]; then
-      devp2p dns sign "${D}" "$CRAWL_DNS_SIGNING_KEY"
+      echo "" | devp2p dns sign "${D}" "$CRAWL_DNS_SIGNING_KEY"
     fi
   done
 }
