@@ -1,6 +1,6 @@
-FROM ethereum/client-go:alltools-latest as geth
+FROM ethereum/client-go:alltools-v1.9.8 as geth
 
-FROM alpine:latest
+FROM alpine:3.10
 
 ENV CRAWL_TIMEOUT=30m \
     CRAWL_DNS_SIGNING_KEY=/secrets/key.json \
