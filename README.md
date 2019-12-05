@@ -2,13 +2,15 @@
 
 ## Background
 
-[Geth](https://github.com/ethereum/go-ethereum) now ships with an implementation of EIP-1459. This EIP defines a way to put devp2p node lists behind a DNS name. There are a couple of things worth knowing about this system:
+[Geth](https://github.com/ethereum/go-ethereum) now ships with an implementation of [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459). This EIP defines a way to put devp2p node lists behind a DNS name. There are a couple of things worth knowing about this system:
 
     EIP-1459 is intended to be a replacement for hard-coded bootstrap node lists that we maintain in Ethereum clients.
     This is a centralized system where all nodes configured with a certain name resolve subdomains of the name find bootstrap nodes.
     The node list is signed with a key which will be hard-coded into the client (i.e. geth) and which we should keep in a secure place.
 
 To create suitable bootstrap node lists for all common networks, we have devised a scheme where software crawls the discovery DHT, then creates a list of all found nodes in JSON format. The crawler software can filter this list and has a built-in deployer that can install the DNS records.
+
+You can read the [DNS Discovery Setup Guide](https://geth.ethereum.org/docs/developers/dns-discovery-setup) for more information about the discovery DHT crawler.
 
 ## Description
 
