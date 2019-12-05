@@ -1,14 +1,17 @@
 #!/bin/sh
 
+CRAWL_GIT_REPO="${CRAWL_GIT_REPO:-https://github.com/skylenet/discv4-crawl.git}"
 CRAWL_GIT_BRANCH="${CRAWL_GIT_BRANCH:-master}"
+CRAWL_GIT_PUSH="${CRAWL_GIT_PUSH:-false}"
 CRAWL_GIT_USER="${CRAWL_GIT_USER:-crawler}"
 CRAWL_GIT_EMAIL="${CRAWL_GIT_EMAIL:-crawler@localhost}"
-CRAWL_GIT_REPO="${CRAWL_GIT_REPO:-git@github.com:skylenet/discv4-crawl.git}"
 
 CRAWL_TIMEOUT="${CRAWL_TIMEOUT:-30m}"
 CRAWL_DNS_SIGNING_KEY="${CRAWL_DNS_SIGNING_KEY}:-/secrets/key.json"
 
 set -xe
+
+# Function definitions
 
 git_setup() {
   git config --global user.email "$CRAWL_GIT_EMAIL"
@@ -21,9 +24,11 @@ git_setup() {
 generate_list() {
   devp2p discv4 crawl -timeout "$CRAWL_TIMEOUT" all.json
 
+  # Mainnet: All nodes
   mkdir -p all.mainnet.nodes.ethereum.org
   devp2p nodeset filter all.json -eth-network mainnet > all.mainnet.nodes.ethereum.org/nodes.json
 
+  # Mainnet: LES nodes
   mkdir -p les.mainnet.nodes.ethereum.org
   devp2p nodeset filter all.json -eth-network mainnet -les-server > les.mainnet.nodes.ethereum.org/nodes.json
 
@@ -39,8 +44,8 @@ sign_lists() {
 }
 
 git_push() {
-  if ! [ -z "$(git status --porcelain)" ]; then
-    git add *.nodes.ethereum.org/nodes.json
+  if [ -n "$(git status --porcelain)" ]; then
+    git add ./*.nodes.ethereum.org/nodes.json
     git commit --message "automatic update: crawl time $CRAWL_TIMEOUT"
     git push origin "$CRAWL_GIT_BRANCH"
   fi
@@ -50,7 +55,10 @@ git_push() {
 
 git_setup
 generate_list
-git_push
+
+if [ "$CRAWL_GIT_PUSH" = true ] ; then
+  git_push
+fi
 
 if [ -f "$CRAWL_DNS_SIGNING_KEY" ]; then
   sign_lists
