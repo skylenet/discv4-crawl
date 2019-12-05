@@ -5,7 +5,7 @@ CRAWL_GIT_USER="${CRAWL_GIT_USER:-crawler}"
 CRAWL_GIT_EMAIL="${CRAWL_GIT_EMAIL:-crawler@localhost}"
 CRAWL_GIT_REPO="${CRAWL_GIT_REPO:-git@github.com:skylenet/discv4-crawl.git}"
 
-CRAWL_TIMEOUT="${CRAWL_TIMEOUT:-10m}"
+CRAWL_TIMEOUT="${CRAWL_TIMEOUT:-30m}"
 CRAWL_DNS_SIGNING_KEY="${CRAWL_DNS_SIGNING_KEY}:-/secrets/key.json"
 
 set -xe
