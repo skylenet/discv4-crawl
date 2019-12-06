@@ -14,6 +14,8 @@ CLOUDFLARE_ZONE_ID="${CLOUDFLARE_ZONE_ID-}"
 
 set -xe
 
+networks="mainnet rinkeby goerli ropsten"
+
 # Function definitions
 
 git_setup() {
@@ -27,13 +29,16 @@ git_setup() {
 generate_list() {
   devp2p discv4 crawl -timeout "$CRAWL_TIMEOUT" all.json
 
-  # Mainnet: All nodes
-  mkdir -p all.mainnet.nodes.ethflare.xyz
-  devp2p nodeset filter all.json -eth-network mainnet > all.mainnet.nodes.ethflare.xyz/nodes.json
+  for N in $networks
+  do
+    # All nodes
+    mkdir -p "all.${N}.nodes.ethflare.xyz"
+    devp2p nodeset filter all.json -eth-network "${N}" > "all.${N}.nodes.ethflare.xyz/nodes.json"
 
-  # Mainnet: LES nodes
-  mkdir -p les.mainnet.nodes.ethflare.xyz
-  devp2p nodeset filter all.json -eth-network mainnet -les-server > les.mainnet.nodes.ethflare.xyz/nodes.json
+    # LES nodes
+    mkdir -p "les.${N}.nodes.ethflare.xyz"
+    devp2p nodeset filter all.json -eth-network "${N}" -les-server > "les.${N}.nodes.ethflare.xyz/nodes.json"
+  done
 }
 
 sign_lists() {
