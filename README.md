@@ -18,11 +18,33 @@ This repository contains the scripts used to automatically generate the list of 
 
 ## Running with docker
 
-Build the image:
+
+
+### Environment variables
+
+Name | Default | Description
+-----| ------- | -------
+`CRAWL_GIT_REPO` | `https://github.com/skylenet/discv4-crawl.git` | Git repository `used to clone and push the node list
+`CRAWL_GIT_BRANCH` | `master` | Git branch used for the fetch and push
+`CRAWL_GIT_PUSH` | `false` | When set to `true`, it will push the node lists to the git repository
+`CRAWL_GIT_USER` | `crawler` | Git username. Will appear in the commit messages.
+`CRAWL_GIT_EMAIL` | `crawler@localhost` | Git email address. Will appear in the `commit messages.
+`CRAWL_TIMEOUT` | `30m` | The time spent crawling the discovery DHT
+`CRAWL_INTERVAL` | `300` | Interval, in seconds, between multiple executions.
+`CRAWL_RUN_ONCE` | `false` | Set to `true` if you only want to run the execution once.
+`CRAWL_DNS_SIGNING_KEY` | `/secrets/key.json` | Path to the signing key. Won't sign if the file doesn't exist.
+`CRAWL_DNS_PUBLISH` | `false` | Publish the TXT records to a DNS zone on Cloudflare
+`CLOUDFLARE_API_TOKEN`| `` | API token used for the Cloudflare API
+`CLOUDFLARE_ZONE_ID` | `` | The identifier of the Cloudflare zone that should be updated
+
+
+### Building the image
 
 ```sh
 $ docker build -t disc4-crawl .
 ```
+
+### Run examples
 
 Run the list generation and push the results to git via SSH:
 
@@ -35,15 +57,3 @@ $ docker run -it \
     -e CRAWL_GIT_PUSH=true \ # Specify that we want to push the changes
     discv4-crawl
 ```
-
-### Environment variables
-
-Name | Default | Description
------| ------- | -------
-`CRAWL_TIMEOUT` | `30m` | The time spent crawling the discovery DHT
-`CRAWL_GIT_REPO` | `https://github.com/skylenet/discv4-crawl.git` | Git repository `used to clone and push the node list
-`CRAWL_GIT_BRANCH` | `master` | Git branch used for the fetch and push
-`CRAWL_GIT_PUSH` | `false` | When set to `true`, it will push the node lists to the git repository
-`CRAWL_GIT_USER` | `crawler` | Git username. Will appear in the commit messages.
-`CRAWL_GIT_EMAIL` | `crawler@localhost` | Git email address. Will appear in the `commit messages.
-`CRAWL_DNS_SIGNING_KEY` | `/secrets/key.json` | Path to the signing key. Won't sign if the file doesn't exist.

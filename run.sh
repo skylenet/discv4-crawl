@@ -7,6 +7,8 @@ CRAWL_GIT_USER="${CRAWL_GIT_USER:-crawler}"
 CRAWL_GIT_EMAIL="${CRAWL_GIT_EMAIL:-crawler@localhost}"
 
 CRAWL_TIMEOUT="${CRAWL_TIMEOUT:-30m}"
+CRAWL_INTERVAL="${CRAWL_INTERVAL:-300}"
+CRAWL_RUN_ONCE="${CRAWL_RUN_ONCE:-false}"
 CRAWL_DNS_SIGNING_KEY="${CRAWL_DNS_SIGNING_KEY:-/secrets/key.json}"
 CRAWL_DNS_PUBLISH="${CRAWL_DNS_PUBLISH-false}"
 CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN-}"
@@ -24,6 +26,10 @@ git_setup() {
   git clone "$CRAWL_GIT_REPO" discv4-crawl
   cd discv4-crawl
   git checkout "$CRAWL_GIT_BRANCH"
+}
+
+git_pull() {
+  git pull
 }
 
 generate_list() {
@@ -68,17 +74,37 @@ git_push() {
 # Main execution
 
 git_setup
-generate_list
 
+while true
+do
+  # Pull changes from git repo
+  git_pull
 
-if [ -f "$CRAWL_DNS_SIGNING_KEY" ]; then
-  sign_lists
-fi
+  # Generate node lists
+  generate_list
 
-if [ "$CRAWL_GIT_PUSH" = true ] ; then
-  git_push
-fi
+  # Sign lists
+  if [ -f "$CRAWL_DNS_SIGNING_KEY" ]; then
+    sign_lists
+  fi
 
-if [ "$CRAWL_DNS_PUBLISH" = true ] ; then
-  publish_dns
-fi
+  # Push changes back to git repo
+  if [ "$CRAWL_GIT_PUSH" = true ] ; then
+    git_push
+  fi
+
+  # Publish DNS records
+  if [ "$CRAWL_DNS_PUBLISH" = true ] ; then
+    publish_dns
+  fi
+
+  # Publish DNS records
+  if [ "$CRAWL_RUN_ONCE" = true ] ; then
+    echo "Ran once. Job is done. Exiting..."
+    break
+  fi
+
+  # Wait for the next run
+  echo "Waiting $CRAWL_INTERVAL seconds for the next run..."
+  sleep "$CRAWL_INTERVAL"
+done
