@@ -10,7 +10,13 @@ CRAWL_TIMEOUT="${CRAWL_TIMEOUT:-30m}"
 CRAWL_INTERVAL="${CRAWL_INTERVAL:-300}"
 CRAWL_RUN_ONCE="${CRAWL_RUN_ONCE:-false}"
 CRAWL_DNS_SIGNING_KEY="${CRAWL_DNS_SIGNING_KEY:-/secrets/key.json}"
-CRAWL_DNS_PUBLISH="${CRAWL_DNS_PUBLISH-false}"
+
+CRAWL_DNS_PUBLISH_ROUTE53="${CRAWL_DNS_PUBLISH_ROUTE53-false}"
+ROUTE53_ZONE_ID="${ROUTE53_ZONE_ID-}"
+AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID-}"
+AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY-}"
+
+CRAWL_DNS_PUBLISH_CLOUDFLARE="${CRAWL_DNS_PUBLISH_CLOUDFLARE-false}"
 CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN-}"
 CLOUDFLARE_ZONE_ID="${CLOUDFLARE_ZONE_ID-}"
 
@@ -55,10 +61,18 @@ sign_lists() {
   done
 }
 
-publish_dns() {
+publish_dns_cloudflare() {
   for D in *.nodes.ethflare.xyz; do
     if [ -d "${D}" ]; then
       devp2p dns to-cloudflare -zoneid "$CLOUDFLARE_ZONE_ID" "${D}"
+    fi
+  done
+}
+
+publish_dns_route53() {
+  for D in *.nodes.ethflare.xyz; do
+    if [ -d "${D}" ]; then
+      devp2p dns to-route53 -zone-id "$ROUTE53_ZONE_ID" "${D}"
     fi
   done
 }
@@ -94,8 +108,11 @@ do
   fi
 
   # Publish DNS records
-  if [ "$CRAWL_DNS_PUBLISH" = true ] ; then
-    publish_dns
+  if [ "$CRAWL_DNS_PUBLISH_CLOUDFLARE" = true ] ; then
+    publish_dns_cloudflare
+  fi
+  if [ "$CRAWL_DNS_PUBLISH_ROUTE53" = true ] ; then
+    publish_dns_route53
   fi
 
   # Publish DNS records

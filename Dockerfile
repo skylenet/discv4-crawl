@@ -1,4 +1,4 @@
-FROM ethereum/client-go:alltools-v1.9.8 as geth
+FROM skylenet/go-ethereum:v1.9.9-21-gb9c87b000 as geth
 
 FROM alpine:3.10
 
@@ -11,7 +11,11 @@ ENV CRAWL_GIT_REPO=https://github.com/skylenet/discv4-crawl.git \
     CRAWL_INTERVAL=300 \
     CRAWL_RUN_ONCE=false \
     CRAWL_DNS_SIGNING_KEY=/secrets/key.json \
-    CRAWL_DNS_PUBLISH=false \
+    CRAWL_DNS_PUBLISH_ROUTE53=false \
+    ROUTE53_ZONE_ID="" \
+    AWS_ACCESS_KEY_ID="" \
+    AWS_SECRET_ACCESS_KEY="" \
+    CRAWL_DNS_PUBLISH_CLOUDFLARE=false \
     CLOUDFLARE_API_TOKEN="" \
     CLOUDFLARE_ZONE_ID=""
 

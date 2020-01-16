@@ -33,9 +33,13 @@ Name | Default | Description
 `CRAWL_INTERVAL` | `300` | Interval, in seconds, between multiple executions.
 `CRAWL_RUN_ONCE` | `false` | Set to `true` if you only want to run the execution once.
 `CRAWL_DNS_SIGNING_KEY` | `/secrets/key.json` | Path to the signing key. Won't sign if the file doesn't exist.
-`CRAWL_DNS_PUBLISH` | `false` | Publish the TXT records to a DNS zone on Cloudflare
+`CRAWL_DNS_PUBLISH_ROUTE53`| `false`| Publish the TXT records to a DNS zone on AWS Route53
+`ROUTE53_ZONE_ID` | `` | Route53 DNS zone identifier. This is the zone where the records will be published to.
+`AWS_ACCESS_KEY_ID` | `` | AWS access key
+`AWS_SECRET_ACCESS_KEY` | `` | AWS secret access key
+`CRAWL_DNS_PUBLISH_CLOUDFLARE` | `false` | Publish the TXT records to a DNS zone on Cloudflare
 `CLOUDFLARE_API_TOKEN`| `` | API token used for the Cloudflare API
-`CLOUDFLARE_ZONE_ID` | `` | The identifier of the Cloudflare zone that should be updated
+`CLOUDFLARE_ZONE_ID` | `` | Cloudflare DNS zone identifier. This is the zone where the records will be published to.
 
 
 ### Building the image
