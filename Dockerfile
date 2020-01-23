@@ -1,6 +1,6 @@
-FROM skylenet/go-ethereum:v1.9.9-21-gb9c87b000 as geth
+FROM ethereum/client-go:alltools-v1.9.10 as geth
 
-FROM alpine:3.10
+FROM alpine:3.11
 
 ENV CRAWL_GIT_REPO=https://github.com/skylenet/discv4-crawl.git \
     CRAWL_GIT_BRANCH=master \
