@@ -24,7 +24,7 @@ This repository contains the scripts used to automatically generate the list of 
 
 Name | Default | Description
 -----| ------- | -------
-`CRAWL_GIT_REPO` | `https://github.com/skylenet/discv4-crawl.git` | Git repository `used to clone and push the node list
+`CRAWL_GIT_REPO` | `https://github.com/skylenet/discv4-dns-lists.git` | Git repository `used to clone and push the node list
 `CRAWL_GIT_BRANCH` | `master` | Git branch used for the fetch and push
 `CRAWL_GIT_PUSH` | `false` | When set to `true`, it will push the node lists to the git repository
 `CRAWL_GIT_USER` | `crawler` | Git username. Will appear in the commit messages.
