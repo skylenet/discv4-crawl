@@ -20,6 +20,12 @@ CRAWL_DNS_PUBLISH_CLOUDFLARE="${CRAWL_DNS_PUBLISH_CLOUDFLARE-false}"
 CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN-}"
 CLOUDFLARE_ZONE_ID="${CLOUDFLARE_ZONE_ID-}"
 
+CRAWL_PUBLISH_METRICS="${CRAWL_PUBLISH_METRICS:-false}"
+INFLUXDB_URL="${INFLUXDB_URL:-http://localhost:8086}"
+INFLUXDB_DB="${INFLUXDB_DB:-metrics}"
+INFLUXDB_USER="${INFLUXDB_USER:-user}"
+INFLUXDB_PASSWORD="${INFLUXDB_PASSWORD:-password}"
+
 set -xe
 
 networks="mainnet rinkeby goerli ropsten"
@@ -85,6 +91,22 @@ git_push() {
   fi
 }
 
+publish_metrics() {
+  echo -n "" > metrics.txt
+  for D in *.nodes.ethflare.xyz; do
+    if [ -d "${D}" ]; then
+      LEN=$(jq length < "${D}/nodes.json")
+      echo "devp2p_discv4.dns_node_count,domain=${D} value=${LEN}i" >> metrics.txt
+    fi
+  done
+  cat metrics.txt
+  set +x
+  curl -i -u "${INFLUXDB_USER}:${INFLUXDB_PASSWORD}" \
+       -XPOST "${INFLUXDB_URL}/write?db=${INFLUXDB_DB}" --data-binary @metrics.txt
+  set -x
+  rm metrics.txt
+}
+
 # Main execution
 
 git_setup
@@ -113,6 +135,11 @@ do
   fi
   if [ "$CRAWL_DNS_PUBLISH_ROUTE53" = true ] ; then
     publish_dns_route53
+  fi
+
+  # Publish metrics
+  if [ "$CRAWL_PUBLISH_METRICS" = true ] ; then
+    publish_metrics
   fi
 
   # Publish DNS records

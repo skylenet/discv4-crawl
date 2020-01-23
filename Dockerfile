@@ -17,11 +17,15 @@ ENV CRAWL_GIT_REPO=https://github.com/skylenet/discv4-dns-lists.git \
     AWS_SECRET_ACCESS_KEY="" \
     CRAWL_DNS_PUBLISH_CLOUDFLARE=false \
     CLOUDFLARE_API_TOKEN="" \
-    CLOUDFLARE_ZONE_ID=""
-
+    CLOUDFLARE_ZONE_ID="" \
+    CRAWL_PUBLISH_METRICS=false \
+    INFLUXDB_URL=http://localhost:8086 \
+    INFLUXDB_DB=metrics \
+    INFLUXDB_USER=user \
+    INFLUXDB_PASSWORD=password
 
 COPY --from=geth /usr/local/bin/devp2p /usr/local/bin/
-RUN apk update && apk add --no-cache git openssh
+RUN apk update && apk add --no-cache git openssh curl jq
 
 WORKDIR /crawler
 ADD run.sh .

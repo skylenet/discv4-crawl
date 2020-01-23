@@ -40,7 +40,11 @@ Name | Default | Description
 `CRAWL_DNS_PUBLISH_CLOUDFLARE` | `false` | Publish the TXT records to a DNS zone on Cloudflare
 `CLOUDFLARE_API_TOKEN`| `` | API token used for the Cloudflare API
 `CLOUDFLARE_ZONE_ID` | `` | Cloudflare DNS zone identifier. This is the zone where the records will be published to.
-
+`CRAWL_PUBLISH_METRICS` | `false` | Set to `true` if you want to send metrics to InfluxDB
+`INFLUXDB_URL` | `http://localhost:8086` | Address of the InfluxDB API
+`INFLUXDB_DB` | `metrics` | Database name
+`INFLUXDB_USER` | `user` | Username for InfluxDB
+`INFLUXDB_PASSWORD` | `password` | Password for InfluxDB
 
 ### Building the image
 
