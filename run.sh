@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CRAWL_GIT_REPO="${CRAWL_GIT_REPO:-https://github.com/skylenet/discv4-crawl.git}"
+CRAWL_GIT_REPO="${CRAWL_GIT_REPO:-https://github.com/skylenet/discv4-dns-lists.git}"
 CRAWL_GIT_BRANCH="${CRAWL_GIT_BRANCH:-master}"
 CRAWL_GIT_PUSH="${CRAWL_GIT_PUSH:-false}"
 CRAWL_GIT_USER="${CRAWL_GIT_USER:-crawler}"
@@ -29,8 +29,8 @@ networks="mainnet rinkeby goerli ropsten"
 git_setup() {
   git config --global user.email "$CRAWL_GIT_EMAIL"
   git config --global user.name "$CRAWL_GIT_USER"
-  git clone "$CRAWL_GIT_REPO" discv4-crawl
-  cd discv4-crawl
+  git clone "$CRAWL_GIT_REPO" output
+  cd output
   git checkout "$CRAWL_GIT_BRANCH"
 }
 

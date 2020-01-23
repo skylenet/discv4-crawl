@@ -2,7 +2,7 @@ FROM ethereum/client-go:alltools-v1.9.10 as geth
 
 FROM alpine:3.11
 
-ENV CRAWL_GIT_REPO=https://github.com/skylenet/discv4-crawl.git \
+ENV CRAWL_GIT_REPO=https://github.com/skylenet/discv4-dns-lists.git \
     CRAWL_GIT_BRANCH=master \
     CRAWL_GIT_PUSH=false \
     CRAWL_GIT_USER=crawler \
