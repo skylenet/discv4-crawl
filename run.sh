@@ -33,6 +33,7 @@ networks="mainnet rinkeby goerli ropsten"
 # Function definitions
 
 git_setup() {
+  rm -rf output
   git config --global user.email "$CRAWL_GIT_EMAIL"
   git config --global user.name "$CRAWL_GIT_USER"
   git clone "$CRAWL_GIT_REPO" output
