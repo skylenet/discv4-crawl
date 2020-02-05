@@ -1,6 +1,4 @@
-FROM ethereum/client-go:alltools-v1.9.10 as geth
-
-FROM alpine:3.11
+FROM golang:latest
 
 ENV CRAWL_GIT_REPO=https://github.com/skylenet/discv4-dns-lists.git \
     CRAWL_GIT_BRANCH=master \
@@ -24,8 +22,7 @@ ENV CRAWL_GIT_REPO=https://github.com/skylenet/discv4-dns-lists.git \
     INFLUXDB_USER=user \
     INFLUXDB_PASSWORD=password
 
-COPY --from=geth /usr/local/bin/devp2p /usr/local/bin/
-RUN apk update && apk add --no-cache git openssh curl jq
+RUN apt-get update && apt-get install -y --no-install-recommends git curl jq
 
 WORKDIR /crawler
 ADD run.sh .
