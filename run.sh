@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 CRAWL_GIT_REPO="${CRAWL_GIT_REPO:-https://github.com/skylenet/discv4-dns-lists.git}"
 CRAWL_GIT_BRANCH="${CRAWL_GIT_BRANCH:-master}"
@@ -29,20 +29,25 @@ INFLUXDB_PASSWORD="${INFLUXDB_PASSWORD:-password}"
 set -xe
 
 networks="mainnet rinkeby goerli ropsten"
+geth_src="$PWD/go-ethereum"
 
 # Function definitions
 
-git_setup() {
-  rm -rf output
-  git config --global user.email "$CRAWL_GIT_EMAIL"
-  git config --global user.name "$CRAWL_GIT_USER"
-  git clone "$CRAWL_GIT_REPO" output
-  cd output
-  git checkout "$CRAWL_GIT_BRANCH"
+git_update_repo() {
+  upstream=$1
+  repodir=$2
+  branch=${3:-master}
+
+  if [[ -d $repodir/.git ]]; then
+    ( cd $repodir; git pull $upstream; git checkout $branch )
+  else
+    git clone --depth 1 --branch $branch $upstream $repodir
+  fi
 }
 
-git_pull() {
-  git pull
+update_devp2p_tool() {
+  git_update_repo https://github.com/ethereum/go-ethereum "$geth_src"
+  ( cd "$geth_src" && go build ./cmd/devp2p )
 }
 
 generate_list() {
@@ -84,7 +89,7 @@ publish_dns_route53() {
   done
 }
 
-git_push() {
+git_push_crawler_output() {
   if [ -n "$(git status --porcelain)" ]; then
     git add all.json ./*.nodes.ethflare.xyz/*.json
     git commit --message "automatic update: crawl time $CRAWL_TIMEOUT"
@@ -110,12 +115,17 @@ publish_metrics() {
 
 # Main execution
 
-git_setup
+git config --global user.email "$CRAWL_GIT_EMAIL"
+git config --global user.name "$CRAWL_GIT_USER"
+git_update_repo "$CRAWL_GIT_REPO" output "$CRAWL_GIT_BRANCH"
+
+PATH="$geth_src:$PATH"
+cd output
 
 while true
 do
-  # Pull changes from git repo
-  git_pull
+  # Pull changes from go-ethereum.
+  update_devp2p_tool
 
   # Generate node lists
   generate_list
@@ -127,7 +137,7 @@ do
 
   # Push changes back to git repo
   if [ "$CRAWL_GIT_PUSH" = true ] ; then
-    git_push
+    git_push_crawler_output
   fi
 
   # Publish DNS records
