@@ -29,6 +29,7 @@ Name | Default | Description
 `CRAWL_GIT_PUSH` | `false` | When set to `true`, it will push the node lists to the git repository
 `CRAWL_GIT_USER` | `crawler` | Git username. Will appear in the commit messages.
 `CRAWL_GIT_EMAIL` | `crawler@localhost` | Git email address. Will appear in the `commit messages.
+`CRAWL_DNS_DOMAIN`| `nodes.example.local` | DNS domain suffix used for the directory structure
 `CRAWL_TIMEOUT` | `30m` | The time spent crawling the discovery DHT
 `CRAWL_INTERVAL` | `300` | Interval, in seconds, between multiple executions.
 `CRAWL_RUN_ONCE` | `false` | Set to `true` if you only want to run the execution once.
@@ -61,7 +62,7 @@ $ docker run -it \
     -v "$HOME/.ssh/crawler:/root/.ssh" \  # Needed if you use git via SSH
     -v "$HOME/secrets/secret-signing-key.json:/secrets/key.json" \ # Only needed if you want to sign the node lists
     -e CRAWL_TIMEOUT=10m \ # Specify your custom timeout
-    -e CRAWL_GIT_REPO=git@github.com:skylenet/discv4-crawl.git \ # Use SSH instead of HTTPS
+    -e CRAWL_GIT_REPO=git@github.com:skylenet/discv4-dns-lists.git \ # Use SSH instead of HTTPS
     -e CRAWL_GIT_PUSH=true \ # Specify that we want to push the changes
-    discv4-crawl
+    skylenet/discv4-crawl
 ```
