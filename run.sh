@@ -6,6 +6,7 @@ CRAWL_GIT_PUSH="${CRAWL_GIT_PUSH:-false}"
 CRAWL_GIT_USER="${CRAWL_GIT_USER:-crawler}"
 CRAWL_GIT_EMAIL="${CRAWL_GIT_EMAIL:-crawler@localhost}"
 
+CRAWL_DNS_DOMAIN="${CRAWL_DNS_DOMAIN:-nodes.example.local}"
 CRAWL_TIMEOUT="${CRAWL_TIMEOUT:-30m}"
 CRAWL_INTERVAL="${CRAWL_INTERVAL:-300}"
 CRAWL_RUN_ONCE="${CRAWL_RUN_ONCE:-false}"
@@ -39,9 +40,9 @@ git_update_repo() {
   branch=${3:-master}
 
   if [[ -d $repodir/.git ]]; then
-    ( cd $repodir; git pull $upstream; git checkout $branch )
+    ( cd "$repodir"; git pull "$upstream"; git checkout "$branch" )
   else
-    git clone --depth 1 --branch $branch $upstream $repodir
+    git clone --depth 1 --branch "$branch" "$upstream" "$repodir"
   fi
 }
 
@@ -56,17 +57,17 @@ generate_list() {
   for N in $networks
   do
     # All nodes
-    mkdir -p "all.${N}.nodes.ethflare.xyz"
-    devp2p nodeset filter all.json -eth-network "${N}" > "all.${N}.nodes.ethflare.xyz/nodes.json"
+    mkdir -p "all.${N}.${CRAWL_DNS_DOMAIN}"
+    devp2p nodeset filter all.json -eth-network "${N}" > "all.${N}.${CRAWL_DNS_DOMAIN}/nodes.json"
 
     # LES nodes
-    mkdir -p "les.${N}.nodes.ethflare.xyz"
-    devp2p nodeset filter all.json -eth-network "${N}" -les-server > "les.${N}.nodes.ethflare.xyz/nodes.json"
+    mkdir -p "les.${N}.${CRAWL_DNS_DOMAIN}"
+    devp2p nodeset filter all.json -eth-network "${N}" -les-server > "les.${N}.${CRAWL_DNS_DOMAIN}/nodes.json"
   done
 }
 
 sign_lists() {
-  for D in *.nodes.ethflare.xyz; do
+  for D in *."${CRAWL_DNS_DOMAIN}"; do
     if [ -d "${D}" ]; then
       echo "" | devp2p dns sign "${D}" "$CRAWL_DNS_SIGNING_KEY"
     fi
@@ -74,7 +75,7 @@ sign_lists() {
 }
 
 publish_dns_cloudflare() {
-  for D in *.nodes.ethflare.xyz; do
+  for D in *."${CRAWL_DNS_DOMAIN}"; do
     if [ -d "${D}" ]; then
       devp2p dns to-cloudflare -zoneid "$CLOUDFLARE_ZONE_ID" "${D}"
     fi
@@ -82,7 +83,7 @@ publish_dns_cloudflare() {
 }
 
 publish_dns_route53() {
-  for D in *.nodes.ethflare.xyz; do
+  for D in *."${CRAWL_DNS_DOMAIN}"; do
     if [ -d "${D}" ]; then
       devp2p dns to-route53 -zone-id "$ROUTE53_ZONE_ID" "${D}"
     fi
@@ -91,7 +92,7 @@ publish_dns_route53() {
 
 git_push_crawler_output() {
   if [ -n "$(git status --porcelain)" ]; then
-    git add all.json ./*.nodes.ethflare.xyz/*.json
+    git add all.json ./*."${CRAWL_DNS_DOMAIN}"/*.json
     git commit --message "automatic update: crawl time $CRAWL_TIMEOUT"
     git push origin "$CRAWL_GIT_BRANCH"
   fi
@@ -99,7 +100,7 @@ git_push_crawler_output() {
 
 publish_metrics() {
   echo -n "" > metrics.txt
-  for D in *.nodes.ethflare.xyz; do
+  for D in *."${CRAWL_DNS_DOMAIN}"; do
     if [ -d "${D}" ]; then
       LEN=$(jq length < "${D}/nodes.json")
       echo "devp2p_discv4.dns_node_count,domain=${D} value=${LEN}i" >> metrics.txt

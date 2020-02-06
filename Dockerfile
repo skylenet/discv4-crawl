@@ -5,6 +5,7 @@ ENV CRAWL_GIT_REPO=https://github.com/skylenet/discv4-dns-lists.git \
     CRAWL_GIT_PUSH=false \
     CRAWL_GIT_USER=crawler \
     CRAWL_GIT_EMAIL=crawler@localhost \
+    CRAWL_DNS_DOMAIN=nodes.example.local \
     CRAWL_TIMEOUT=30m \
     CRAWL_INTERVAL=300 \
     CRAWL_RUN_ONCE=false \
