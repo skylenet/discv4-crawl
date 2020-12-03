@@ -63,6 +63,10 @@ generate_list() {
     # LES nodes
     mkdir -p "les.${N}.${CRAWL_DNS_DOMAIN}"
     devp2p nodeset filter all.json -eth-network "${N}" -les-server > "les.${N}.${CRAWL_DNS_DOMAIN}/nodes.json"
+
+    # SNAP nodes
+    mkdir -p "snap.${N}.${CRAWL_DNS_DOMAIN}"
+    devp2p nodeset filter all.json -eth-network "${N}" -snap > "snap.${N}.${CRAWL_DNS_DOMAIN}/nodes.json"
   done
 }
 
