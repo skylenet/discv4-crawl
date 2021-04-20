@@ -29,7 +29,6 @@ INFLUXDB_PASSWORD="${INFLUXDB_PASSWORD:-password}"
 
 set -xe
 
-networks="mainnet rinkeby goerli ropsten"
 geth_src="$PWD/go-ethereum"
 
 # Function definitions
@@ -51,23 +50,35 @@ update_devp2p_tool() {
   ( cd "$geth_src" && go build ./cmd/devp2p )
 }
 
+filter_list() {
+  network="$1"
+  name="$2"
+  shift 2
+
+  mkdir -p "${name}.${network}.${CRAWL_DNS_DOMAIN}"
+  devp2p nodeset filter all.json -eth-network "$network" $@ > "${name}.${network}.${CRAWL_DNS_DOMAIN}/nodes.json"
+}
+
 generate_list() {
-  devp2p discv4 crawl -timeout "$CRAWL_TIMEOUT" all.json
+  # Mainnet
+  filter_list mainnet all   -limit 3000
+  filter_list mainnet les   -limit 200  -les-server
+  filter_list mainnet snap  -limit 500  -snap
 
-  for N in $networks
-  do
-    # All nodes
-    mkdir -p "all.${N}.${CRAWL_DNS_DOMAIN}"
-    devp2p nodeset filter all.json -eth-network "${N}" > "all.${N}.${CRAWL_DNS_DOMAIN}/nodes.json"
+  # Rinkeby
+  filter_list rinkeby all   -limit 500
+  filter_list rinkeby les   -limit 50   -les-server
+  filter_list rinkeby snap  -limit 50   -snap
 
-    # LES nodes
-    mkdir -p "les.${N}.${CRAWL_DNS_DOMAIN}"
-    devp2p nodeset filter all.json -eth-network "${N}" -les-server > "les.${N}.${CRAWL_DNS_DOMAIN}/nodes.json"
+  # Goerli
+  filter_list goerli all    -limit 500
+  filter_list goerli les    -limit 50   -les-server
+  filter_list goerli snap   -limit 50   -snap
 
-    # SNAP nodes
-    mkdir -p "snap.${N}.${CRAWL_DNS_DOMAIN}"
-    devp2p nodeset filter all.json -eth-network "${N}" -snap > "snap.${N}.${CRAWL_DNS_DOMAIN}/nodes.json"
-  done
+  # Ropsten
+  filter_list ropsten all   -limit 500
+  filter_list ropsten les   -limit 50   -les-server
+  filter_list ropsten snap  -limit 50   -snap
 }
 
 sign_lists() {
