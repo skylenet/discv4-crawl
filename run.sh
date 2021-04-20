@@ -60,6 +60,8 @@ filter_list() {
 }
 
 generate_list() {
+  devp2p discv4 crawl -timeout "$CRAWL_TIMEOUT" all.json
+
   # Mainnet
   filter_list mainnet all   -limit 3000
   filter_list mainnet les   -limit 200  -les-server
