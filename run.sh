@@ -81,6 +81,11 @@ generate_list() {
   filter_list ropsten all   -limit 500
   filter_list ropsten les   -limit 50   -les-server
   filter_list ropsten snap  -limit 50   -snap
+
+  # Sepolia
+  filter_list sepolia all   -limit 500
+  filter_list sepolia les   -limit 50   -les-server
+  filter_list sepolia snap  -limit 50   -snap
 }
 
 sign_lists() {
