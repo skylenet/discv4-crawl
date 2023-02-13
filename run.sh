@@ -77,11 +77,6 @@ generate_list() {
   filter_list goerli les    -limit 50   -les-server
   filter_list goerli snap   -limit 50   -snap
 
-  # Ropsten
-  filter_list ropsten all   -limit 250
-  filter_list ropsten les   -limit 25   -les-server
-  filter_list ropsten snap  -limit 25   -snap
-
   # Sepolia
   filter_list sepolia all   -limit 250
   filter_list sepolia les   -limit 25   -les-server
