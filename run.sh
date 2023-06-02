@@ -67,11 +67,6 @@ generate_list() {
   filter_list mainnet les   -limit 200  -les-server
   filter_list mainnet snap  -limit 500  -snap
 
-  # Rinkeby
-  filter_list rinkeby all   -limit 500
-  filter_list rinkeby les   -limit 50   -les-server
-  filter_list rinkeby snap  -limit 50   -snap
-
   # Goerli
   filter_list goerli all    -limit 500
   filter_list goerli les    -limit 50   -les-server
