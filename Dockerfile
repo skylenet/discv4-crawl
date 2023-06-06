@@ -17,14 +17,17 @@ ENV CRAWL_GIT_REPO=https://github.com/skylenet/discv4-dns-lists.git \
     CRAWL_DNS_PUBLISH_CLOUDFLARE=false \
     CLOUDFLARE_API_TOKEN="" \
     CLOUDFLARE_ZONE_ID="" \
-    CRAWL_PUBLISH_METRICS=false \
+    INFLUXDB_METRICS_ENABLED=false \
     INFLUXDB_URL=http://localhost:8086 \
     INFLUXDB_DB=metrics \
     INFLUXDB_USER=user \
-    INFLUXDB_PASSWORD=password
+    INFLUXDB_PASSWORD=password \
+    PROMETHEUS_METRICS_ENABLED=true \
+    PROMETHEUS_METRICS_LISTEN=0.0.0.0:9100
 
 RUN apt-get update && apt-get install -y --no-install-recommends git curl jq
 
+EXPOSE 9100
 WORKDIR /crawler
 ADD run.sh .
 CMD ["./run.sh"]

@@ -21,12 +21,16 @@ CRAWL_DNS_PUBLISH_CLOUDFLARE="${CRAWL_DNS_PUBLISH_CLOUDFLARE-false}"
 CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN-}"
 CLOUDFLARE_ZONE_ID="${CLOUDFLARE_ZONE_ID-}"
 
-CRAWL_PUBLISH_METRICS="${CRAWL_PUBLISH_METRICS:-false}"
+INFLUXDB_METRICS_ENABLED="${INFLUXDB_METRICS_ENABLED:-false}"
 INFLUXDB_URL="${INFLUXDB_URL:-http://localhost:8086}"
 INFLUXDB_DB="${INFLUXDB_DB:-metrics}"
 INFLUXDB_USER="${INFLUXDB_USER:-user}"
 INFLUXDB_PASSWORD="${INFLUXDB_PASSWORD:-password}"
 
+PROMETHEUS_METRICS_ENABLED="${PROMETHEUS_METRICS_ENABLED:-true}"
+PROMETHEUS_METRICS_LISTEN="${PROMETHEUS_METRICS_LISTEN:-0.0.0.0:9100}"
+
+prometheus_metrics_dir=$(mktemp -d)
 set -xe
 
 geth_src="$PWD/go-ethereum"
@@ -110,7 +114,7 @@ git_push_crawler_output() {
   fi
 }
 
-publish_metrics() {
+publish_influx_metrics() {
   echo -n "" > metrics.txt
   for D in *."${CRAWL_DNS_DOMAIN}"; do
     if [ -d "${D}" ]; then
@@ -126,6 +130,23 @@ publish_metrics() {
   rm metrics.txt
 }
 
+init_prometheus_metrics() {
+  go install -v github.com/projectdiscovery/simplehttpserver/cmd/simplehttpserver@v0.0.6
+  simplehttpserver -listen "${PROMETHEUS_METRICS_LISTEN}" -path "${prometheus_metrics_dir}" -silent &
+  publish_prometheus_metrics
+}
+
+publish_prometheus_metrics() {
+  prometheus_metrics_file="${prometheus_metrics_dir}/metrics"
+  echo -n "" > "${prometheus_metrics_file}"
+  for D in *."${CRAWL_DNS_DOMAIN}"; do
+    if [ -d "${D}" ]; then
+      LEN=$(jq length < "${D}/nodes.json")
+      echo "devp2p_discv4_dns_nodes{domain=\"${D}\"} ${LEN}" >> "${prometheus_metrics_file}"
+    fi
+  done
+}
+
 # Main execution
 
 git config --global user.email "$CRAWL_GIT_EMAIL"
@@ -134,6 +155,8 @@ git_update_repo "$CRAWL_GIT_REPO" output "$CRAWL_GIT_BRANCH"
 
 PATH="$geth_src:$PATH"
 cd output
+
+init_prometheus_metrics
 
 while true
 do
@@ -162,11 +185,13 @@ do
   fi
 
   # Publish metrics
-  if [ "$CRAWL_PUBLISH_METRICS" = true ] ; then
-    publish_metrics
+  if [ "$INFLUXDB_METRICS_ENABLED" = true ] ; then
+    publish_influx_metrics
+  fi
+  if [ "$PROMETHEUS_METRICS_ENABLED" = true ] ; then
+    publish_prometheus_metrics
   fi
 
-  # Publish DNS records
   if [ "$CRAWL_RUN_ONCE" = true ] ; then
     echo "Ran once. Job is done. Exiting..."
     break
@@ -176,3 +201,6 @@ do
   echo "Waiting $CRAWL_INTERVAL seconds for the next run..."
   sleep "$CRAWL_INTERVAL"
 done
+
+# Kill all background jobs
+kill "$(jobs -p)"
