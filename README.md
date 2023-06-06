@@ -1,7 +1,5 @@
 # discv4-crawl
 
-⚠️ **Update:** New contributions should go to the active [ethereum/discv4-crawl](https://github.com/ethereum/discv4-crawl) fork.
-
 ## Background
 
 [Geth](https://github.com/ethereum/go-ethereum) now ships with an implementation of [EIP-1459](https://eips.ethereum.org/EIPS/eip-1459). This EIP defines a way to put devp2p node lists behind a DNS name. There are a couple of things worth knowing about this system:
